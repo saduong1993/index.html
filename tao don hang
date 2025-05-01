@@ -1,0 +1,252 @@
+// Khôi phục lại toàn bộ logic theo yêu cầu trước đó và sửa lỗi đóng dấu ngoặc
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+
+export default function TaoDonHang() {
+  const khachHangTheoHangLe = [
+    "Hải Đăng", "Hoa - VP TDI", "Thu Hằng", "Trần Đăng", "Sasimi", "A phi", "Yến Linh", "Cô Ngà", "A Quyết",
+    "Chu Bích Thùy", "BAo ANh LS", "Chi Men", "189 Logistics", "anh Duy hải quan", "a Tiệp aru",
+    "Hoàng Con - Hương Cua", "Hoa kichi", "NHC", "Eric Ruan", "Linh", "T", "天意",
+    "c Hường (Ngô Hường)", "Minh Bình", "Duy Bách  ( HP )", "Anh Cảnh", "Sergei"
+  ];
+
+  const daiLyTheoKhach = {
+    "Hải Đăng": ["JL001"], "Hoa - VP TDI": ["YL118"], "Thu Hằng": ["YL119"], "Trần Đăng": ["YL120"],
+    "Sasimi": ["YL122"], "A phi": ["YL123"], "Yến Linh": ["YL124"], "Cô Ngà": ["YL125A", "YL125B"],
+    "A Quyết": ["YL127", "YL132", "YL133", "TD135"], "Chu Bích Thùy": ["YL128"], "BAo ANh LS": ["YL131"],
+    "Chi Men": ["YL130", "YL155", "YL156", "YL157", "YL158", "YL159", "YL160", "YL665"],
+    "189 Logistics": ["YL189"], "anh Duy hải quan": ["YL190"], "a Tiệp aru": ["YL191"],
+    "Hoàng Con - Hương Cua": ["YL121", "YL192", "YL193", "YL194", "YL195", "YL129", "YL126", "YL102", "YL103", "YL101", "YL333"],
+    "Hoa kichi": ["YL162"], "NHC": ["YL314"], "Eric Ruan": ["YL161"], "Linh": ["YL164"], "T": ["YL163"],
+    "天意": ["YL309"], "c Hường (Ngô Hường)": ["YL136"], "Minh Bình": ["YL137"], "Duy Bách  ( HP )": ["YL201"],
+    "Anh Cảnh": ["YL79-1", "YL79-5", "YL79-7", "YL79-2", "YL793", "YL79-9", "YL-NA71"], "Sergei": ["YL294"]
+  };
+
+  const [formData, setFormData] = useState({
+    benDichVuThongQuan: "",
+    diaChiKhoGiaoHang: "",
+    loaiHinh: "",
+    tenHang: "",
+    khachHang: "",
+    maDaiLy: "",
+    diemDi: "",
+    diemDen: "",
+    cuaKhau: "",
+    loaiXeTQ: "",
+    loaiXeVN: "",
+    vanChuyenBo: false,
+    vanChuyenBay: false,
+    vanChuyenBien: false,
+    nhaCungCapBo: "",
+    nhaCungCapBay: "",
+    nhaCungCapBien: "",
+    maDonHang: "",
+    congTyKhaiBao: "",
+    soMAWB: "",
+    soToKhai: "",
+    ngayTaoDon: "",
+    soXeTQ: "",
+    trongLuong: "",
+    soKien: "",
+    triGiaUSD: "",
+    soXeVN: "",
+    ghiChu: "",
+    trangThai: ""
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleLoaiHinhChange = (value) => {
+    const today = new Date();
+    const yyyyMMdd = today.toISOString().split("T")[0].replace(/-/g, "");
+    const stt = Math.floor(Math.random() * 900 + 100);
+    const prefixMap = {
+      hangLe: "HL",
+      hangTMDT: "TMDT",
+      nhapKinhDoanh: "KD",
+      nhapChuyenKhau: "NCK",
+      xuatChuyenKhau: "XCK",
+      hangTap: "TAP"
+    };
+    const hangMap = {
+      hangLe: "HÀNG LẺ",
+      hangTMDT: "TMDT",
+      nhapKinhDoanh: "NHẬP KINH DOANH",
+      nhapChuyenKhau: "NHẬP CHUYỂN KHẨU",
+      xuatChuyenKhau: "XUẤT KHẨU",
+      hangTap: "TẠP"
+    };
+    const prefix = prefixMap[value] || value.toUpperCase();
+    const autoMa = `${prefix}_${yyyyMMdd}_${stt}`;
+    setFormData({
+      ...formData,
+      loaiHinh: value,
+      maDonHang: autoMa,
+      tenHang: hangMap[value] || ""
+    });
+  };
+
+  const khachHangOptions = formData.loaiHinh === "hangLe" ? khachHangTheoHangLe : null;
+  const maDaiLyOptions = formData.loaiHinh === "hangLe" && formData.khachHang ? daiLyTheoKhach[formData.khachHang] || [] : [];
+
+  // thêm checkbox hình thức vận chuyển và nhà cung cấp tương ứng
+  const handleCheckboxChange = (key) => (e) => {
+    setFormData({ ...formData, [key]: e.target.checked });
+  };
+
+  return (
+    <Card className="max-w-5xl mx-auto p-6 mt-6">
+      <CardContent>
+        <form className="grid grid-cols-2 gap-4">
+          <Input name="maDonHang" value={formData.maDonHang} disabled placeholder="Mã đơn hàng" />
+
+          <Select onValueChange={handleLoaiHinhChange}>
+            <SelectTrigger><SelectValue placeholder="Loại hình dịch vụ" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="hangLe">Hàng lẻ</SelectItem>
+              <SelectItem value="hangTMDT">Thương mại điện tử</SelectItem>
+              <SelectItem value="nhapKinhDoanh">Nhập kinh doanh</SelectItem>
+              <SelectItem value="nhapChuyenKhau">Nhập chuyển khẩu</SelectItem>
+              <SelectItem value="xuatChuyenKhau">Xuất chuyển khẩu</SelectItem>
+              <SelectItem value="hangTap">Hàng tạp</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Input name="tenHang" value={formData.tenHang} disabled placeholder="Tên hàng" />
+
+          {khachHangOptions ? (
+            <Select onValueChange={(value) => setFormData({ ...formData, khachHang: value })}>
+              <SelectTrigger><SelectValue placeholder="Tên khách hàng" /></SelectTrigger>
+              <SelectContent>
+                {khachHangOptions.map((kh) => <SelectItem key={kh} value={kh}>{kh}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          ) : (
+            <Input name="khachHang" value={formData.khachHang} onChange={handleChange} placeholder="Tên khách hàng" />
+          )}
+
+          {maDaiLyOptions.length > 0 && (
+            <Select onValueChange={(value) => setFormData({ ...formData, maDaiLy: value })}>
+              <SelectTrigger><SelectValue placeholder="Mã đại lý" /></SelectTrigger>
+              <SelectContent>
+                {maDaiLyOptions.map((ma) => <SelectItem key={ma} value={ma}>{ma}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          )}
+
+          <Input name="diemDi" value={formData.diemDi} onChange={handleChange} placeholder="Điểm đi" />
+
+          <Select onValueChange={(value) => setFormData({ ...formData, diemDen: value })}>
+            <SelectTrigger><SelectValue placeholder="Điểm đến" /></SelectTrigger>
+            <SelectContent>
+              {["Hà Nội", "Hồ Chí Minh", "Đà Nẵng", "Hải Phòng", "KHÁC"].map((tp) => (
+                <SelectItem key={tp} value={tp}>{tp}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select onValueChange={(value) => setFormData({ ...formData, cuaKhau: value })}>
+            <SelectTrigger><SelectValue placeholder="Cửa khẩu" /></SelectTrigger>
+            <SelectContent>
+              {["TÂN THANH", "HỮU NGHỊ", "CHI MA", "KHÁC"].map((ck) => (
+                <SelectItem key={ck} value={ck}>{ck}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select onValueChange={(value) => setFormData({ ...formData, loaiXeTQ: value })}>
+            <SelectTrigger><SelectValue placeholder="Loại xe Trung Quốc" /></SelectTrigger>
+            <SelectContent>
+              {["9M6", "13M", "13M5", "16M", "16M2", "16M5", "17M", "17M5", "18M", "KHÁC"].map((xe) => (
+                <SelectItem key={xe} value={xe}>{xe}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select onValueChange={(value) => setFormData({ ...formData, loaiXeVN: value })}>
+            <SelectTrigger><SelectValue placeholder="Loại xe Việt Nam" /></SelectTrigger>
+            <SelectContent>
+              {["1,5 TẤN", "2,5 TẤN", "3 TẤN", "5 TẤN", "8 TẤN", "10 TẤN", "MOOC RÀO", "CONT 45", "CONT 50", "CONT 53", "CONT", "KHÁC"].map((xe) => (
+                <SelectItem key={xe} value={xe}>{xe}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Input name="congTyKhaiBao" value={formData.congTyKhaiBao} onChange={handleChange} placeholder="Công ty khai báo" />
+          <Input name="soMAWB" value={formData.soMAWB} onChange={handleChange} placeholder="Số MAWB / Invoice" />
+          <Input name="soToKhai" value={formData.soToKhai} onChange={handleChange} placeholder="Số tờ khai" />
+          <Input name="ngayTaoDon" value={formData.ngayTaoDon} onChange={handleChange} placeholder="Ngày tạo đơn" />
+          <Input name="soXeTQ" value={formData.soXeTQ} onChange={handleChange} placeholder="Số xe TQ" />
+          <Input name="soXeVN" value={formData.soXeVN} onChange={handleChange} placeholder="Số xe VN" />
+          <Input name="trongLuong" value={formData.trongLuong} onChange={handleChange} placeholder="Trọng lượng hàng" />
+          <Input name="soKien" value={formData.soKien} onChange={handleChange} placeholder="Số kiện" />
+          <Input name="triGiaUSD" value={formData.triGiaUSD} onChange={handleChange} placeholder="Tổng trị giá USD" />
+
+          <Textarea name="ghiChu" value={formData.ghiChu} onChange={handleChange} placeholder="Ghi chú chi tiết về đơn hàng..." />
+          <Input name="trangThai" value={formData.trangThai} onChange={handleChange} placeholder="Trạng thái đơn hàng" />
+
+          <div className="col-span-2">
+            <label className="block mb-1 font-medium">Hình thức vận chuyển</label>
+            <div className="flex gap-4">
+              <label className="flex items-center space-x-2">
+                <input type="checkbox" checked={formData.vanChuyenBo} onChange={handleCheckboxChange('vanChuyenBo')} />
+                <span>Đường bộ</span>
+              </label>
+              <label className="flex items-center space-x-2">
+                <input type="checkbox" checked={formData.vanChuyenBay} onChange={handleCheckboxChange('vanChuyenBay')} />
+                <span>Đường bay</span>
+              </label>
+              <label className="flex items-center space-x-2">
+                <input type="checkbox" checked={formData.vanChuyenBien} onChange={handleCheckboxChange('vanChuyenBien')} />
+                <span>Đường biển</span>
+              </label>
+            </div>
+          </div>
+
+          {formData.vanChuyenBo && (
+            <Input name="nhaCungCapBo" value={formData.nhaCungCapBo} onChange={handleChange} placeholder="Nhà cung cấp đường bộ" />
+          )}
+
+          {formData.vanChuyenBay && (
+            <Input name="nhaCungCapBay" value={formData.nhaCungCapBay} onChange={handleChange} placeholder="Nhà cung cấp đường bay" />
+          )}
+
+          {formData.vanChuyenBien && (
+            <Input name="nhaCungCapBien" value={formData.nhaCungCapBien} onChange={handleChange} placeholder="Nhà cung cấp đường biển" />
+          )}
+
+          {["hangTMDT", "hangTap", "nhapKinhDoanh", "nhapChuyenKhau"].includes(formData.loaiHinh) && (
+            <>
+              <Select name="benDichVuThongQuan" onValueChange={(value) => setFormData({ ...formData, benDichVuThongQuan: value })}>
+  <SelectTrigger><SelectValue placeholder="Bên dịch vụ thông quan" /></SelectTrigger>
+  <SelectContent>
+    {["NGUYÊN KHÁNH", "STALI", "ALB", "KVMB", "KHÁC"].map((item) => (
+      <SelectItem key={item} value={item}>{item}</SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+              <Select name="diaChiKhoGiaoHang" onValueChange={(value) => setFormData({ ...formData, diaChiKhoGiaoHang: value })}>
+  <SelectTrigger><SelectValue placeholder="Địa chỉ kho giao hàng" /></SelectTrigger>
+  <SelectContent>
+    {["HNT", "KVMB", "KHÁC"].map((item) => (
+      <SelectItem key={item} value={item}>{item}</SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+            </>
+          )}
+
+          <div className="col-span-2 flex justify-end">
+            <Button type="submit">Lưu đơn hàng</Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
